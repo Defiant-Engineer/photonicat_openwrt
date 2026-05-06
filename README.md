@@ -1,173 +1,190 @@
-# Photonicat 2 - 新一代便携智能路由器
+# Photonicat 2 OpenWrt
 
 <div align="center">
 <img src="https://photonicat.com/images/thumb/d/d7/Pcat2-wiki.webp/1200px-Pcat2-wiki.webp.png?20250822110422" alt="Photonicat 2" width="350" height="350"/>
 </div>
 
-Photonicat 2，在原有基础上进行了多方面的增强与升级：
+Photonicat 2 is a portable smart router platform based on the Rockchip RK3678 SoC. This fork keeps the Photonicat 2 hardware support while moving the default firmware closer to a stock OpenWrt experience.
 
-🖥️ **CPU 升级**：由原来的 4 核升级为 8 核，采用先进的 8nm RK3678 SoC，计算性能和能效全面提升。
+## Hardware Highlights
 
-🧠 **内存升级**：由 DDR4 升级为 LPDDR5 内存，支持 On-Die ECC，自修复能力更强，数据稳定性更高。
+- **CPU upgrade**: 8-core RK3678 SoC built on an 8 nm process.
+- **Memory upgrade**: LPDDR5 with On-Die ECC support.
+- **Antenna system**: 7 internal enhanced antennas, plus support for 4 external antennas.
+- **Battery upgrade**: Integrated 4 x 18650 battery pack.
+- **Power system**: Supports batteryless DC operation and 30 W bidirectional fast charging.
+- **Storage expansion**: eMMC, SD card, and NVMe SSD support.
+- **Display**: Built-in screen for device and network status.
+- **Sensors**: Coulomb meter for current/capacity measurement and a G-sensor for motion/orientation.
+- **Software**: OpenWrt support, with Debian, Ubuntu, and Android firmware options available separately.
 
-📡 **天线增强**：内置7根增强型天线，支持4根可扩展外置天线，信号更强。
+## Supported Devices
 
-🔋 **电池升级**：内置 4 × 18650 大容量电池，续航能力显著提升。
+This source tree supports Photonicat v1 and Photonicat 2 devices.
 
-🔌 **电源系统升级**：支持 无电池运行（直流供电模式），并新增 双向快充 30W 功能，既可快速自充，也可作为移动电源反向输出。
+- https://photonicat.com/
+- https://photonicat.com/wiki
 
-💾 **存储扩展**：除 eMMC/SD 外，新增对 NVMe 固态硬盘的支持，提供高速存储能力。
+## About This Fork
 
-📺 **新增交互**：内置屏幕，可实时显示设备状态和网络信息。
+This fork removes the Chinese-focused default packages, Chinese LuCI translations, and the custom Photonicat web UI from the Photonicat 2 image while keeping the hardware-specific support packages:
 
-📊 **传感器扩展**：集成库仑计（Columb Meter），支持精确电流/电量测量；G-sensor 提供移动检测与姿态感应。
+- `pcat-manager`
+- `pcat2-display-mini`
+- Photonicat power-management and watchdog drivers
 
-🛠️ **软件兼容**：保持 OpenWRT 开源支持，灵活安装丰富插件，同时可刷入 Debian、Ubuntu、Android 固件
+The Photonicat 2 mini display package is pinned to this fork:
 
----
+- https://github.com/Defiant-Engineer/photonicat2_mini_display
 
-## 支持设备
+## Default Settings
 
-本源码支持 Photonicat v1 和 v2 设备，专为便携智能路由器优化。
+The Photonicat 2 image is intended to behave closer to stock OpenWrt defaults:
 
-1. https://photonicat.com/
-2. https://photonicat.com/wiki
+- Default LAN IP: `192.168.1.1`
+- Default LAN netmask: `255.255.255.0`
+- DHCP server: enabled on LAN
+- Default Wi-Fi SSID prefix: `OpenWrt`
+- Default Wi-Fi encryption: open, matching normal first-boot OpenWrt behavior
+- LuCI runs on the normal web interface instead of the removed Photonicat custom port-80 page
 
-## 注意
+Set a root password after first login.
 
-1. **不要用 root 用户进行编译**
-2. 国内用户编译前最好准备好梯子
-3. 默认登录IP 172.16.0.1 密码 photonicat
+## Build Notes
 
-## 编译命令
+1. Do not build as `root`.
+2. Use a case-sensitive filesystem.
+3. A clean Debian 13 or Ubuntu 24.04 LTS build host is recommended.
+4. The first build can take a long time and may need significant disk space.
 
-1. 首先装好 Linux 系统，推荐 Debian 13或 Ubuntu 24.04 LTS
-
-2. 安装编译依赖
-
-   ```bash
-   sudo apt update -y
-   sudo apt full-upgrade -y
-   sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
-   bzip2 ccache clang cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext \
-   genisoimage git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev \
-   libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev \
-   libreadline-dev libssl-dev libtool llvm lrzsz msmtp ninja-build p7zip p7zip-full patch pkgconf \
-   python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion \
-   swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
-   ```
-
-3. 下载源代码，更新 feeds 并选择配置
-
-   ```bash
-   git clone https://github.com/coolsnowwolf/lede
-   cd lede
-   ./scripts/feeds update -a
-   ./scripts/feeds install -a
-   make menuconfig
-   ```
-
-4. 下载 dl 库，编译固件
-（-j 后面是线程数，第一次编译推荐用单线程）
-
-   ```bash
-   make download -j8
-   make V=s -j1
-   ```
-
-本套代码保证肯定可以编译成功。里面包括了 R24 所有源代码，包括 IPK 的。
-
-你可以自由使用，但源码编译二次发布请注明我的 GitHub 仓库链接。谢谢合作！
-
-二次编译：
+## Install Build Dependencies
 
 ```bash
-cd lede
-git pull
+sudo apt update -y
+sudo apt full-upgrade -y
+sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+  bzip2 ccache clang cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext \
+  genisoimage git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev \
+  libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev \
+  libreadline-dev libssl-dev libtool llvm lrzsz msmtp ninja-build p7zip p7zip-full patch pkgconf \
+  python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion \
+  swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+```
+
+## Build Photonicat 2 Firmware
+
+```bash
+git clone https://github.com/Defiant-Engineer/photonicat_openwrt.git
+cd photonicat_openwrt
+git switch photonicat2-openwrt-cleanup-only
+
+./scripts/feeds update -a
+./scripts/feeds install -a
+cp configs/photonicat2_base_defconfig .config
+make defconfig
+
+make download -j"$(nproc)"
+make V=s -j"$(nproc)"
+```
+
+Build outputs are written to:
+
+```txt
+bin/targets
+```
+
+## Rebuild After Updating
+
+```bash
+cd photonicat_openwrt
+git pull --ff-only
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 make defconfig
-make download -j8
-make V=s -j$(nproc)
+make download -j"$(nproc)"
+make V=s -j"$(nproc)"
 ```
 
-如果需要重新配置：
+## Reconfigure From Scratch
 
 ```bash
-rm -rf .config
+rm -rf .config tmp
+cp configs/photonicat2_base_defconfig .config
 make menuconfig
-make V=s -j$(nproc)
+make V=s -j"$(nproc)"
 ```
 
-编译完成后输出路径：bin/targets
+## WSL/WSL2 Notes
 
-### 使用 WSL/WSL2 进行编译
-
-由于 WSL 的 PATH 中包含带有空格的 Windows 路径，有可能会导致编译失败，请在 `make` 前面加上：
+WSL can include Windows paths with spaces in `PATH`, which may break the OpenWrt build. If needed, run builds with a clean Linux-style path:
 
 ```bash
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make V=s -j"$(nproc)"
 ```
 
-由于默认情况下，装载到 WSL 发行版的 NTFS 格式的驱动器将不区分大小写，因此大概率在 WSL/WSL2 的编译检查中会返回以下错误：
+OpenWrt also requires a case-sensitive filesystem. NTFS paths mounted into WSL are commonly case-insensitive and may fail with:
 
 ```txt
 Build dependency: OpenWrt can only be built on a case-sensitive filesystem
 ```
 
-一个比较简洁的解决方法是，在 `git clone` 前先创建 Repository 目录，并为其启用大小写敏感：
+Create a repository directory and enable case sensitivity before cloning:
 
 ```powershell
-# 以管理员身份打开终端
-PS > fsutil.exe file setCaseSensitiveInfo <your_local_lede_path> enable
-# 将本项目 git clone 到开启了大小写敏感的目录 <your_local_lede_path> 中
-PS > git clone https://github.com/coolsnowwolf/lede <your_local_lede_path>
+# Run from an elevated Windows terminal.
+fsutil.exe file setCaseSensitiveInfo <your_local_photonicat_openwrt_path> enable
+git clone https://github.com/Defiant-Engineer/photonicat_openwrt.git <your_local_photonicat_openwrt_path>
 ```
 
-> 对已经 `git clone` 完成的项目目录执行 `fsutil.exe` 命令无法生效，大小写敏感只对新增的文件变更有效。
+Enabling case sensitivity after cloning may not fix files that already exist.
 
-### macOS 原生系统进行编译
+## macOS Native Build Notes
 
-1. 在 AppStore 中安装 Xcode
+Linux is recommended. If building on macOS, install Xcode from the App Store and install Homebrew:
 
-2. 安装 Homebrew：
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
+Install the required GNU tools:
 
-3. 使用 Homebrew 安装工具链、依赖与基础软件包：
+```bash
+brew unlink awk
+brew install coreutils diffutils findutils gawk gnu-getopt gnu-tar grep make ncurses pkg-config wget quilt xz
+brew install gcc@11
+```
 
-   ```bash
-   brew unlink awk
-   brew install coreutils diffutils findutils gawk gnu-getopt gnu-tar grep make ncurses pkg-config wget quilt xz
-   brew install gcc@11
-   ```
+For Intel Macs:
 
-4. 然后输入以下命令，添加到系统环境变量中：
+```bash
+echo 'export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"' >> ~/.bashrc
+```
 
-   - intel 芯片的 mac
+For Apple Silicon Macs:
 
-   ```bash
-   echo 'export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"' >> ~/.bashrc
-   ```
+```bash
+echo 'export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/opt/homebrew/opt/findutils/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/opt/homebrew/opt/gnu-getopt/bin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"' >> ~/.bashrc
+echo 'export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"' >> ~/.bashrc
+```
 
-   - apple 芯片的 mac
+Reload your shell configuration, then build from a Bash shell:
 
-   ```zsh
-   echo 'export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/opt/homebrew/opt/findutils/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/opt/homebrew/opt/gnu-getopt/bin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/opt/homebrew/opt/gnu-tar/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"' >> ~/.bashrc
-   echo 'export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"' >> ~/.bashrc
-   ```
+```bash
+source ~/.bashrc
+bash
+```
 
-5. 重新加载一下 shell 启动文件 `source ~/.bashrc`，然后输入 `bash` 进入 bash shell，就可以和 Linux 一样正常编译了
+## License
+
+This tree is based on Lean's LEDE/OpenWrt source tree and Photonicat's OpenWrt work. Packages under `package/lean` are provided under their respective licenses, including GPLv3 where applicable.
