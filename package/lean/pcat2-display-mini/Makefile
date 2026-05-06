@@ -12,9 +12,9 @@ PKG_VERSION:=1.0.0
 PKG_RELEASE:=38
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/photonicat/photonicat2_mini_display
-PKG_SOURCE_DATE:=2026-03-16
-PKG_SOURCE_VERSION:=b98c9ed69928d93265743df9ab6c7b98f5c71b45
+PKG_SOURCE_URL:=https://github.com/Defiant-Engineer/photonicat2_mini_display
+PKG_SOURCE_DATE:=2026-05-06
+PKG_SOURCE_VERSION:=22606e2354b219b0dc593dd91e94a08ba9025d36
 
 PKG_LICENSE:=GPL-3.0
 PKG_LICENSE_FILES:=LICENSE
@@ -36,9 +36,9 @@ define Package/pcat2-display-mini
   TITLE:=Display service for photonicat2
   SECTION:=utils
   CATEGORY:=Utilities
-  DEPENDS:=$(GO_ARCH_DEPENDS)
+  DEPENDS:=$(GO_ARCH_DEPENDS) +iwinfo +vnstat2 +qmi-utils +uqmi
   PROVIDES:=pcat2-display-mini
-  URL:=https://git.g77k.com/yiling.cao/photonicat2_display_go.git
+  URL:=https://github.com/Defiant-Engineer/photonicat2_mini_display
 endef
 
 define Package/pcat2-display-mini/description
