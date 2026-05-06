@@ -11,19 +11,8 @@ mkdir -p /tmp/oem
 mount -t vfat -o ro /dev/mmcblk0boot1 /tmp/oem 2>/dev/null || true
 if [ -f "/tmp/oem/oem.txt" ]; then
     source "/tmp/oem/oem.txt"
-    mkdir -p /usr/share/pcat-manager-web/oem
-    mkdir -p /usr/share/pcat-manager-web/static
-    cp /tmp/oem/oem.txt /usr/share/pcat-manager-web/
-    cp /tmp/oem/oem-logo.* /usr/share/pcat-manager-web/static/ || true
-    cp /tmp/oem/oem-trademark.* /usr/share/pcat-manager-web/static/ || true
-    cp /tmp/oem/oem-logo-text.* /usr/share/pcat-manager-web/static/ || true
-    cp /tmp/oem/oem-favicon-*.png /usr/share/pcat-manager-web/static/ || true
-    cp /tmp/oem/oem-apple-*.png /usr/share/pcat-manager-web/static/ || true
 fi
 umount /tmp/oem 2>/dev/null || true
-
-uci set luci.main.lang=zh_cn
-uci commit luci
 
 uci set system.@system[0].timezone=CST-8
 uci set system.@system[0].zonename=Asia/Shanghai
